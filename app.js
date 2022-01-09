@@ -17,7 +17,7 @@ const { PORT = 3000, BASE_PATH } = process.env;
 
 const app = express();
 
-//app.use('*', cors());
+app.use('*', cors());
 
 mongoose.connect(NODE_ENV === 'production' ? ADDRESS_BD : mongoUrl);
 
