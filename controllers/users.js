@@ -34,7 +34,7 @@ module.exports.getUsername = (req, res, next) => {
       if (user) {
         res.send({ message: 'Пользователь с таким username уже существует', data: 'error' });
       }
-     res.send({ message: null, data: null });
+     res.send(null);
     })
 
     .catch(next);
