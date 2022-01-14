@@ -1,6 +1,6 @@
 const authorization = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
-const { createUser, login } = require('../controllers/users');
+const { createUser, login, getUsername} = require('../controllers/users');
 
 authorization.post('/signup', celebrate({
   body: Joi.object().keys({
@@ -17,5 +17,11 @@ authorization.post('/signin', celebrate({
     password: Joi.string().required(),
   }),
 }), login);
+
+authorization.post('/username', celebrate({
+  body: Joi.object().keys({
+    username: Joi.string().required().min(2).max(30),
+  }),
+}), getUsername);
 
 module.exports = { authorization };

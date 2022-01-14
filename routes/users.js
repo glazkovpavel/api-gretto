@@ -5,12 +5,12 @@ const { methodValidator } = require('../middlewares/methodValidator');
 
 users.get('/users/me', getUser);
 
-
 users.get('/users/:userId', celebrate({
   params: Joi.object().keys({
     userId: Joi.string().required().length(24).hex(),
   }),
 }), getUserId);
+
 users.patch('/users/me', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),

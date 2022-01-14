@@ -26,6 +26,20 @@ module.exports.getUser = (req, res, next) => {
     .catch(next);
 };
 
+module.exports.getUsername = (req, res, next) => {
+  const { username } = req.body
+
+  User.findOne({ username })
+    .then((user) => {
+      if (user) {
+        res.send({ message: 'Пользователь с таким username уже существует', data: 'error' });
+      }
+     res.send({ message: null, data: null });
+    })
+
+    .catch(next);
+};
+
 module.exports.getUserId = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
