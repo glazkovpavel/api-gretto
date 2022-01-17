@@ -1,5 +1,12 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const {
+  invalidDataErrorText,
+  invalidUserIdErrorText,
+  userIdNotFoundText,
+  duplicateEmailErrorText,
+  wrongCredentialsErrorText,
+} = require('../errors/error-text');
 
 const saltRounds = 10;
 
@@ -14,13 +21,13 @@ module.exports.getUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Запрашиваемый пользователь не найден');
+        throw new NotFoundError(userIdNotFoundText);
       }
       res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestErr('Произошла ошибка валидации');
+        throw new BadRequestErr(invalidDataErrorText);
       }
     })
     .catch(next);
@@ -44,7 +51,7 @@ module.exports.getUserId = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Запрашиваемый пользователь не найден');
+        throw new NotFoundError(userIdNotFoundText);
       }
       res.send({ data: user });
     })
@@ -63,7 +70,7 @@ module.exports.createUser = (req, res, next) => {
     name,
     username,
     about,
-    avatar,
+    avatar = 'https://cdn24.img.ria.ru/images/15427/25/154272500_0:20:640:383_600x0_80_0_0_f2f629e83811ca74442ea07fcdf6c81f.jpg',
     email,
     password,
   } = req.body;
@@ -71,7 +78,7 @@ module.exports.createUser = (req, res, next) => {
   User.findOne({ email })
     .then((user) => {
       if (user) {
-        throw new ConflictErr('Пользователь с таким email уже существует');
+        throw new ConflictErr(duplicateEmailErrorText);
       }
       return bcrypt.hash(password, saltRounds);
     })
@@ -90,45 +97,54 @@ module.exports.createUser = (req, res, next) => {
       }))
       .catch((err) => {
         if (err.name === 'ValidationError') {
-          throw new BadRequestErr('Введены невалидные данные');
+          throw new BadRequestErr(invalidDataErrorText);
         }
       }))
     .catch(next);
 };
 
 module.exports.updateUser = (req, res, next) => {
-  User.findByIdAndUpdate(req.user._id, { name: req.body.name, about: req.body.about },
-    { new: true, runValidators: true })
+  User.findByIdAndUpdate(req.user._id, {
+      name: req.body.name,
+      username: req.body.username,
+      email: req.body.email,
+      avatar: req.body.avatar},
+    { new: true, runValidators: true,  upsert: false })
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Запрашиваемый пользователь не найден');
+        throw new NotFoundError(userIdNotFoundText);
       }
       return res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        throw new BadRequestErr('Произошла ошибка валидации');
+      if (err.name === 'ValidationError') {
+        throw new BadRequestErr(invalidDataErrorText);
+      } else if (err.name === 'CastError') {
+        throw new BadRequestErr(invalidUserIdErrorText);
+      } else if (err.codeName === 'DuplicateKey') {
+        throw new ConflictErr(duplicateEmailErrorText);
       }
+      return next(err);
     })
     .catch(next);
 };
 
-module.exports.updateAvatar = (req, res, next) => {
-  User.findByIdAndUpdate(req.user._id, { avatar: req.body.avatar },
-    { new: true, runValidators: true })
-    .then((user) => {
-      if (!user) {
-        throw new NotFoundError('Запрашиваемый пользователь не найден');
-      }
-      return res.send({ data: user });
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        throw new BadRequestErr('Произошла ошибка валидации');
-      }
-    })
-    .catch(next);
-};
+// module.exports.updateAvatar = (req, res, next) => {
+//   User.findByIdAndUpdate(req.user._id, { avatar: req.body.avatar },
+//     { new: true, runValidators: true })
+//     .then((user) => {
+//       if (!user) {
+//         throw new NotFoundError(userIdNotFoundText);
+//       }
+//       return res.send({ data: user });
+//     })
+//     .catch((err) => {
+//       if (err.name === 'ValidationError' || err.name === 'CastError') {
+//         throw new BadRequestErr(invalidUserIdErrorText);
+//       }
+//     })
+//     .catch(next);
+// };
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
@@ -136,12 +152,12 @@ module.exports.login = (req, res, next) => {
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        throw new UnauthorizedErr('Неправильные почта или пароль');
+        throw new UnauthorizedErr(wrongCredentialsErrorText);
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            throw new UnauthorizedErr('Неправильные почта или пароль');
+            throw new UnauthorizedErr(wrongCredentialsErrorText);
           }
           return user;
         });
