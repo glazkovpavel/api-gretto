@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const { NODE_ENV, JWT_SECRET } = process.env;
 const jwt = require('jsonwebtoken');
 const {
   invalidDataErrorText,
@@ -8,14 +9,13 @@ const {
   wrongCredentialsErrorText,
 } = require('../errors/error-text');
 
-const saltRounds = 10;
-
-const { NODE_ENV, JWT_SECRET } = process.env;
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 const BadRequestErr = require('../errors/bad-request-err');
 const ConflictErr = require('../errors/conflict-err');
 const UnauthorizedErr = require('../errors/unauthorized-err');
+
+const saltRounds = 10;
 
 module.exports.getUser = (req, res, next) => {
   User.findById(req.user._id)
@@ -128,23 +128,6 @@ module.exports.updateUser = (req, res, next) => {
     })
     .catch(next);
 };
-
-// module.exports.updateAvatar = (req, res, next) => {
-//   User.findByIdAndUpdate(req.user._id, { avatar: req.body.avatar },
-//     { new: true, runValidators: true })
-//     .then((user) => {
-//       if (!user) {
-//         throw new NotFoundError(userIdNotFoundText);
-//       }
-//       return res.send({ data: user });
-//     })
-//     .catch((err) => {
-//       if (err.name === 'ValidationError' || err.name === 'CastError') {
-//         throw new BadRequestErr(invalidUserIdErrorText);
-//       }
-//     })
-//     .catch(next);
-// };
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
