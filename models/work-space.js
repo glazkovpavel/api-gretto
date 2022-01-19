@@ -1,25 +1,47 @@
 const mongoose = require('mongoose');
 
-const cardSchema = new mongoose.Schema({
-  card: {
-    titleCard: {
-      type: String,
-      //required: true,
-    },
-    idCard: {
-      type: String,
-      //required: true,
-      //unique: true,
-    },
-    importantCard : {
-      type: Boolean,
-      //required: true,
-    }
-  }
-});
+// const cardSchema = new mongoose.Schema({
+//   card: {
+//     titleCard: {
+//       type: String,
+//       //required: true,
+//     },
+//     idCard: {
+//       type: String,
+//       //required: true,
+//       //unique: true,
+//     },
+//     importantCard : {
+//       type: Boolean,
+//       //required: true,
+//     }
+//   }
+// });
+//
+// const listSchema = new mongoose.Schema({
+//
+//     titleList: {
+//       type: String,
+//     },
+//     idList: {
+//       type: String,
+//       //required: true,
+//       //unique: true,
+//     },
+//     card: [cardSchema]
+// });
 
-const listSchema = new mongoose.Schema({
-  list: {
+const workSpaceSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    //required: true,
+  },
+  id: {
+    type: String,
+    //required: true,
+    //unique: true,
+  },
+  list: [{
     titleList: {
       type: String,
     },
@@ -28,29 +50,29 @@ const listSchema = new mongoose.Schema({
       //required: true,
       //unique: true,
     },
-    card: [cardSchema]}
-});
-
-const workSpaceSchema = new mongoose.Schema({
-  titleSpace: {
-    type: String,
-    //required: true,
-  },
-  idSpace: {
-    type: String,
-    //required: true,
-    //unique: true,
-  },
-  list: [listSchema],
+    card: [{
+      titleCard: {
+        type: String,
+        //required: true,
+      },
+      idCard: {
+        type: String,
+        //required: true,
+        //unique: true,
+      },
+      importantCard : {
+        type: Boolean,
+        //required: true,
+      }}]}],
   //owner: {
     //type: mongoose.Schema.Types.ObjectId,
     //ref: 'user',
     //required: true,
   //},
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  }
+  // createdAt: {
+  //   type: Date,
+  //   default: Date.now,
+  // }
 });
 
 

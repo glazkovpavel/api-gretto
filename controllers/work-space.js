@@ -10,30 +10,14 @@ const {
 
 
 module.exports.createWorkSpace = (req, res, next) => {
-  // const {
-  //   idSpace,
-  //   titleSpace,
-  //   list: [{
-  //     idList,
-  //     titleList,
-  //     card: [{
-  //       idCard,
-  //       titleCard,
-  //       importantCard
-  //     }]
-  //   }]
-  // } = req.body;
-  //
-  console.log(req.body.list.card)
+  const { id } = req.body;
 
-  WorkSpace.findOne({  })
+  WorkSpace.findOne({ id })
     .then((workSpace) => {
       if (workSpace) {
-        this.updateWorkSpace()
+        this.updateWorkSpace(req, res, next)
       }
-      WorkSpace.create({
-        idSpace, titleSpace, idList, titleList, idCard, titleCard, importantCard,
-      })
+      WorkSpace.create(req.body)
         .then((space) => res.status(201).send(space))
         .catch((err) => {
           if (err.name === 'ValidationError') {
@@ -45,30 +29,36 @@ module.exports.createWorkSpace = (req, res, next) => {
     .catch(next);
 };
 
+
+
 module.exports.updateWorkSpace = (req, res, next) => {
   const {
     id,
     title,
-    list: {
+    list: [{
       idList,
       titleList,
-      card: {
+      card: [{
         idCard,
         titleCard,
         importantCard
-      }
-    }
+      }]
+    }]
   } = req.body;
 
   WorkSpace.findByIdAndUpdate(req.user._id, {
-      id, title, idList, titleList, idCard, titleCard, importantCard,
-      },
-    { new: true, runValidators: true,  upsert: false })
+      id, title,  list: {idList, titleList, card: {
+          idCard,
+          titleCard,
+          importantCard
+        }}
+    },
+    { upsert: true, new: true, runValidators: true })
     .then((space) => {
       if (!space) {
         throw new NotFoundError(userIdNotFoundText);
       }
-      return res.send({ data: space });
+      return res.status(201).send(space);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
