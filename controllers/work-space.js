@@ -11,64 +11,45 @@ const {
 
 module.exports.createWorkSpace = (req, res, next) => {
   const { id } = req.body;
+  const  space  = req.body;
+  space.owner = req.user._id
 
   WorkSpace.findOne({ id })
     .then((workSpace) => {
       if (workSpace) {
-        this.updateWorkSpace(req, res, next)
+
+        WorkSpace.findByIdAndUpdate(req.user._id,  req.body,
+          { upsert: true, new: true, runValidators: true })
+          .then((space) => {
+            if (!space) {
+              throw new NotFoundError(userIdNotFoundText);
+            }
+            return res.status(202).send(space);
+          })
+          .catch((err) => {
+            if (err.name === 'ValidationError') {
+              throw new BadRequestErr(invalidDataErrorText);
+            } else if (err.name === 'CastError') {
+              throw new BadRequestErr(invalidUserIdErrorText);
+            } else if (err.codeName === 'DuplicateKey') {
+              throw new ConflictErr(duplicateEmailErrorText);
+            }
+            return next(err);
+          })
+          .catch(next);
+      } else {
+        WorkSpace.create( space)
+          .then((space) => res.status(201).send(space))
+          .catch((err) => {
+            if (err.name === 'ValidationError') {
+              throw new BadRequestErr(invalidDataErrorText);
+            }
+            return next(err);
+          })
+          .catch(next);
       }
-      WorkSpace.create(req.body)
-        .then((space) => res.status(201).send(space))
-        .catch((err) => {
-          if (err.name === 'ValidationError') {
-            throw new BadRequestErr(invalidDataErrorText);
-          }
-        })
-        .catch(next);
     })
     .catch(next);
 };
 
 
-
-module.exports.updateWorkSpace = (req, res, next) => {
-  const {
-    id,
-    title,
-    list: [{
-      idList,
-      titleList,
-      card: [{
-        idCard,
-        titleCard,
-        importantCard
-      }]
-    }]
-  } = req.body;
-
-  WorkSpace.findByIdAndUpdate(req.user._id, {
-      id, title,  list: {idList, titleList, card: {
-          idCard,
-          titleCard,
-          importantCard
-        }}
-    },
-    { upsert: true, new: true, runValidators: true })
-    .then((space) => {
-      if (!space) {
-        throw new NotFoundError(userIdNotFoundText);
-      }
-      return res.status(201).send(space);
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        throw new BadRequestErr(invalidDataErrorText);
-      } else if (err.name === 'CastError') {
-        throw new BadRequestErr(invalidUserIdErrorText);
-      } else if (err.codeName === 'DuplicateKey') {
-        throw new ConflictErr(duplicateEmailErrorText);
-      }
-      return next(err);
-    })
-    .catch(next);
-};
