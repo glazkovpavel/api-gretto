@@ -2,12 +2,10 @@ const mongoose = require('mongoose');
 
 const workSpaceSchema = new mongoose.Schema({
   title: {
-    type: String,
-    required: true,
+    type: String
   },
   id: {
     type: String,
-    required: true,
     unique: true,
   },
   list: [{
@@ -16,22 +14,18 @@ const workSpaceSchema = new mongoose.Schema({
     },
     idList: {
       type: String,
-      required: true,
       unique: true,
     },
     card: [{
       titleCard: {
         type: String,
-        required: true,
       },
       idCard: {
         type: String,
-        required: true,
         unique: true,
       },
       importantCard : {
         type: Boolean,
-        required: true,
       }}]}],
   owner: {
     type: mongoose.Schema.Types.ObjectId,
@@ -43,6 +37,5 @@ const workSpaceSchema = new mongoose.Schema({
     default: Date.now,
   }
 });
-
 
 module.exports = mongoose.model('workSpace', workSpaceSchema);

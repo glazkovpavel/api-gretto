@@ -6,8 +6,17 @@ const {
   duplicateEmailErrorText,
   invalidDataErrorText,
   userIdNotFoundText,
-  invalidUserIdErrorText } = require("../errors/error-text");
+  invalidUserIdErrorText, movieIdNotFoundErrorText, forbiddenErrorText
+} = require("../errors/error-text");
+const ForbiddenErr = require("../errors/forbidden-err");
 
+module.exports.getWorkSpace = (req, res, next) => {
+  const owner = req.user._id;
+
+  WorkSpace.find({owner})
+    .then((spaces) => res.status(200).send(spaces))
+    .catch(next)
+}
 
 module.exports.createWorkSpace = (req, res, next) => {
   const { id } = req.body;
@@ -18,13 +27,15 @@ module.exports.createWorkSpace = (req, res, next) => {
     .then((workSpace) => {
       if (workSpace) {
 
-        WorkSpace.findByIdAndUpdate(req.user._id,  req.body,
-          { upsert: true, new: true, runValidators: true })
+        WorkSpace.findOneAndUpdate(id,  req.body,
+          { upsert: true, new: true })
           .then((space) => {
             if (!space) {
               throw new NotFoundError(userIdNotFoundText);
+            } else {
+              return res.status(200).send(space);
             }
-            return res.status(202).send(space);
+
           })
           .catch((err) => {
             if (err.name === 'ValidationError') {
@@ -52,4 +63,19 @@ module.exports.createWorkSpace = (req, res, next) => {
     .catch(next);
 };
 
+module.exports.deleteSpaceById = (req, res, next) => {
+  const space = {id: req.params.spaceId}
 
+  WorkSpace.findOne(space).select('+owner')
+    .then((space) => {
+      if (!space) {
+        throw new NotFoundError(movieIdNotFoundErrorText);
+      } else if (space.owner.toString() !== req.user._id) {
+        throw new ForbiddenErr(forbiddenErrorText);
+      }
+
+      WorkSpace.findByIdAndDelete(space).select('-owner')
+        .then((deletedMovie) => res.status(200).send(deletedMovie));
+    })
+    .catch(next);
+};
