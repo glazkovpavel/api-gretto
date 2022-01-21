@@ -27,7 +27,7 @@ module.exports.createWorkSpace = (req, res, next) => {
     .then((workSpace) => {
       if (workSpace) {
 
-        WorkSpace.findOneAndUpdate(id,  req.body,
+        WorkSpace.findOneAndUpdate(id,  space,
           { upsert: true, new: true })
           .then((space) => {
             if (!space) {
