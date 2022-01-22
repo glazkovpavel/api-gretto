@@ -6,13 +6,13 @@ workSpace.get('/work-space', getWorkSpace);
 
 workSpace.post('/work-space', celebrate({
   body: Joi.object().keys({
-    id: Joi.string(),
+    _id: Joi.string(),
     title: Joi.string(),
     list: Joi.array().items({
-      idList: Joi.string(),
+      _id: Joi.string(),
       titleList: Joi.string(),
       card: Joi.array().items({
-        idCard: Joi.string(),
+        _id: Joi.string(),
         titleCard: Joi.string(),
         importantCard: Joi.boolean(),
       })}

@@ -4,7 +4,7 @@ const workSpaceSchema = new mongoose.Schema({
   title: {
     type: String
   },
-  id: {
+  _id: {
     type: String,
     unique: true,
   },
@@ -12,7 +12,7 @@ const workSpaceSchema = new mongoose.Schema({
     titleList: {
       type: String,
     },
-    idList: {
+    _id: {
       type: String,
       unique: true,
     },
@@ -20,9 +20,8 @@ const workSpaceSchema = new mongoose.Schema({
       titleCard: {
         type: String,
       },
-      idCard: {
+      _id: {
         type: String,
-        unique: true,
       },
       importantCard : {
         type: Boolean,
@@ -31,10 +30,7 @@ const workSpaceSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
     required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
+    select: false,
   }
 });
 

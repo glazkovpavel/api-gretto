@@ -14,20 +14,22 @@ module.exports.getWorkSpace = (req, res, next) => {
   const owner = req.user._id;
 
   WorkSpace.find({owner})
-    .then((spaces) => res.status(200).send(spaces))
+    .then((spaces) =>
+
+      res.status(200).send(spaces))
     .catch(next)
 }
 
 module.exports.createWorkSpace = (req, res, next) => {
-  const { id } = req.body;
+  const { _id } = req.body;
   const  space  = req.body;
   space.owner = req.user._id
 
-  WorkSpace.findOne({ id })
+  WorkSpace.findOne({ _id })
     .then((workSpace) => {
       if (workSpace) {
 
-        WorkSpace.findOneAndUpdate(id,  space,
+        WorkSpace.findByIdAndUpdate(_id,  space,
           { upsert: true, new: true })
           .then((space) => {
             if (!space) {
@@ -64,7 +66,7 @@ module.exports.createWorkSpace = (req, res, next) => {
 };
 
 module.exports.deleteSpaceById = (req, res, next) => {
-  const space = {id: req.params.spaceId}
+  const space = {_id: req.params.spaceId}
 
   WorkSpace.findOne(space).select('+owner')
     .then((space) => {
