@@ -6,7 +6,6 @@ const journalSchema = new mongoose.Schema({
   },
   date: {
     type: String,
-    required: true,
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,

@@ -29,9 +29,9 @@ module.exports.getJournal = (req, res, next) => {
 };
 
 module.exports.updateJournal = (req, res, next) => {
-  const { data, text } = req.body;
+  const { data } = req.body;
 
-  Journal.findOneAndUpdate(data, { data, text  }, {
+  Journal.findOneAndUpdate(data, req.body, {
     new: true,
     runValidators: true,
     upsert: false,
@@ -60,12 +60,15 @@ module.exports.updateJournal = (req, res, next) => {
 };
 
 module.exports.createJournal = (req, res, next) => {
-  const { data, text } = req.body;
 
-  Journal.create(data, text)
+  const journal = req.body
+  journal.owner = req.user._id
+
+
+  Journal.create(journal)
       .then((journal) => res.status(200).send({
-        text: journal.text,
         date: journal.date,
+        text: journal.text
       }))
       .catch((err) => {
         if (err.name === 'ValidationError') {
