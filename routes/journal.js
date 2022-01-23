@@ -1,19 +1,16 @@
 const journal = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
-const { getJournal, createJournal, updateJournal } = require('../controllers/journal');
+const { getJournal, createJournal } = require('../controllers/journal');
 
-journal.get('/journal', getJournal);
+journal.get('/journal/:journalDate',celebrate({
+  params: Joi.object().keys({
+    journalDate: Joi.string().required()
+  })}), getJournal);
 
-journal.post('/journal', celebrate({
+journal.post('/journal/', celebrate({
   body: Joi.object().keys({
     text: Joi.string(),
     date: Joi.string()
-  })}), createJournal );
-
-journal.put('/journal', celebrate({
-  body: Joi.object().keys({
-    text: Joi.string(),
-    date: Joi.string()
-  })}), updateJournal );
+  })}), createJournal);
 
 module.exports = { journal };
