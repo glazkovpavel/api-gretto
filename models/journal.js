@@ -1,18 +1,17 @@
 const mongoose = require('mongoose');
 
 const journalSchema = new mongoose.Schema({
-  id: {
-    type: String,
-    required: true,
-    unique: true,
-  },
   text: {
     type: String,
   },
   date: {
     type: String,
-    required: true,
   },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
+    required: true,
+  }
 });
 
 module.exports = mongoose.model('journal', journalSchema);
