@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
 
 const taskSchema = new mongoose.Schema({
-  id: {
-    type: String,
-    required: true,
-    unique: true,
-  },
   title: {
     type: String,
     required: true,
@@ -14,6 +9,11 @@ const taskSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
+    required: true,
+  }
 });
 
-module.exports = mongoose.model('journal', taskSchema);
+module.exports = mongoose.model('task', taskSchema);
