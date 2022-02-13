@@ -1,6 +1,6 @@
 const users = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
-const { updateUser, getUser, getUserId } = require('../controllers/users');
+const { updateUser, getUser, getUserId, getUsers } = require('../controllers/users');
 const { methodValidator } = require('../middlewares/methodValidator');
 
 users.get('/users/me', getUser);
@@ -19,5 +19,11 @@ users.patch('/users/me', celebrate({
     avatar: Joi.string().required().custom(methodValidator),
   }),
 }), updateUser);
+
+users.post('/users', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+  }),
+}), getUsers)
 
 module.exports = { users };

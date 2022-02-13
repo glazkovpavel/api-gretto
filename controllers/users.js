@@ -60,8 +60,11 @@ module.exports.getUserId = (req, res, next) => {
 };
 
 module.exports.getUsers = (req, res, next) => {
-  User.find({})
-    .then((users) => res.send({ data: users }))
+
+  const { name } = req.body;
+
+  User.find({ name })
+    .then((users) => res.send( users ))
     .catch(next);
 };
 
