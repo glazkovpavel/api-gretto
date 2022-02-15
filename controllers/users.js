@@ -34,9 +34,9 @@ module.exports.getUser = (req, res, next) => {
 };
 
 module.exports.getUsername = (req, res, next) => {
-  const { username } = req.body
+  const { username, surname } = req.body
 
-  User.findOne({ username })
+  User.findOne({ username, surname })
     .then((user) => {
       if (user) {
         res.send({ message: 'Пользователь с таким username уже существует', data: 'error' });
@@ -72,8 +72,9 @@ module.exports.createUser = (req, res, next) => {
   const {
     name,
     username,
+    surname,
     about,
-    avatar = 'https://cdn24.img.ria.ru/images/15427/25/154272500_0:20:640:383_600x0_80_0_0_f2f629e83811ca74442ea07fcdf6c81f.jpg',
+    avatar,
     email,
     password,
   } = req.body;
@@ -86,11 +87,12 @@ module.exports.createUser = (req, res, next) => {
       return bcrypt.hash(password, saltRounds);
     })
     .then((hash) => User.create({
-      name, username, about, avatar, email, password: hash,
+      name, surname, username, about, avatar, email, password: hash,
     })
       .then((user) => res.status(201).send({
         user: {
           name: user.name,
+          surname: user.surname,
           username: user.username,
           about: user.about,
           avatar: user.avatar,
@@ -109,6 +111,7 @@ module.exports.createUser = (req, res, next) => {
 module.exports.updateUser = (req, res, next) => {
   User.findByIdAndUpdate(req.user._id, {
       name: req.body.name,
+      surname: req.body.surname,
       username: req.body.username,
       email: req.body.email,
       avatar: req.body.avatar},

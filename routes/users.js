@@ -14,15 +14,17 @@ users.get('/users/:userId', celebrate({
 users.patch('/users/me', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
+    surname: Joi.string().required().min(2).max(30),
     username: Joi.string().required().min(2).max(30),
     email: Joi.string().required().email(),
-    avatar: Joi.string().required().custom(methodValidator),
+    avatar: Joi.string().custom(methodValidator),
   }),
 }), updateUser);
 
 users.post('/users', celebrate({
   body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
+    name: Joi.string().min(2).max(30),
+    surname: Joi.string().min(2).max(30),
   }),
 }), getUsers)
 
