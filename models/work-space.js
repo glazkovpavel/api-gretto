@@ -26,12 +26,12 @@ const workSpaceSchema = new mongoose.Schema({
       importantCard : {
         type: Boolean,
       }}]}],
-  owner: {
+  owner: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
+    default: [],
     required: true,
-    select: false,
-  }
+  }]
 });
 
 module.exports = mongoose.model('workSpace', workSpaceSchema);

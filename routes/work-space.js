@@ -1,6 +1,6 @@
 const workSpace = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
-const { createWorkSpace, getWorkSpace, deleteSpaceById } = require('../controllers/work-space');
+const { createWorkSpace, getWorkSpace, deleteSpaceById, updateWorkSpace } = require('../controllers/work-space');
 
 workSpace.get('/work-space', getWorkSpace);
 
@@ -24,5 +24,13 @@ workSpace.delete('/work-space/:spaceId', celebrate({
     spaceId: Joi.string().required().length(11).hex(),
   }),
 }), deleteSpaceById);
+
+workSpace.patch('/work-space/:_id',celebrate({
+  params: Joi.object().keys({
+    _id: Joi.string().required().length(11).hex(),
+  }),
+  body: Joi.object().keys({
+    id: Joi.string().required().length(24).hex(),
+  })}), updateWorkSpace );
 
 module.exports = { workSpace };

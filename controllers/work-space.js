@@ -10,6 +10,31 @@ const {
 } = require("../errors/error-text");
 const ForbiddenErr = require("../errors/forbidden-err");
 
+
+module.exports.updateWorkSpace = (req, res, next) => {
+  WorkSpace.findById(req.params._id)
+    .then((workSpase) => {
+      if (!workSpase) {
+        throw new NotFoundError('Нет workSpase с таким id');
+      }
+      WorkSpace.findByIdAndUpdate(req.params._id,
+        { $addToSet: { owner: req.body.id } },
+        { new: true })
+        .then((workSpase) => {
+          if (workSpase !== null) {
+            res.send({ data: workSpase });
+          } else { throw new NotFoundError('Данного workSpase не существует'); }
+        })
+        .catch((err) => {
+          if (err.name === 'CastError') {
+            throw new BadRequestErr('Произошла ошибка валидации');
+          }
+        });
+    })
+    .catch(next);
+};
+
+
 module.exports.getWorkSpace = (req, res, next) => {
   const owner = req.user._id;
 
