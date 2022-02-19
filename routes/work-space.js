@@ -16,7 +16,8 @@ workSpace.post('/work-space', celebrate({
         titleCard: Joi.string(),
         importantCard: Joi.boolean(),
       })}
-    )
+    ),
+    owner: Joi.array()
   })}), createWorkSpace );
 
 workSpace.delete('/work-space/:spaceId', celebrate({

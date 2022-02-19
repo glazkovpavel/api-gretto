@@ -6,7 +6,7 @@ const workSpaceSchema = new mongoose.Schema({
   },
   _id: {
     type: String,
-    unique: true,
+    //unique: true,
   },
   list: [{
     titleList: {
@@ -14,7 +14,6 @@ const workSpaceSchema = new mongoose.Schema({
     },
     _id: {
       type: String,
-      unique: true,
     },
     card: [{
       titleCard: {
@@ -31,7 +30,12 @@ const workSpaceSchema = new mongoose.Schema({
     ref: 'user',
     default: [],
     required: true,
-  }]
+  }],
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    select: false,
+  }
 });
 
 module.exports = mongoose.model('workSpace', workSpaceSchema);

@@ -48,7 +48,10 @@ module.exports.getWorkSpace = (req, res, next) => {
 module.exports.createWorkSpace = (req, res, next) => {
   const { _id } = req.body;
   const  space  = req.body;
-  space.owner = req.user._id
+
+  if (!req.body.owner.length) {
+    space.owner = req.user._id;
+  }
 
   WorkSpace.findOne({ _id })
     .then((workSpace) => {
