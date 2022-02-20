@@ -79,7 +79,7 @@ module.exports.createWorkSpace = (req, res, next) => {
           })
           .catch(next);
       } else {
-        WorkSpace.create( space)
+        WorkSpace.create( space, {"ordered" : false})
           .then((space) => res.status(201).send(space))
           .catch((err) => {
             if (err.name === 'ValidationError') {

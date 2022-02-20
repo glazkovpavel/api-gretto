@@ -33,6 +33,16 @@ module.exports.getUser = (req, res, next) => {
     .catch(next);
 };
 
+module.exports.getUsersWorkSpace = (req, res, next) => {
+  const { users } = req.body
+
+  User.find( {_id: users} )
+    .then((usersWorkSpace) => {
+      res.send(usersWorkSpace);
+    })
+    .catch(next);
+};
+
 module.exports.getUsername = (req, res, next) => {
   const { username, surname } = req.body
 

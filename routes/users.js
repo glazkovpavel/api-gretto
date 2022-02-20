@@ -1,6 +1,6 @@
 const users = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
-const { updateUser, getUser, getUserId, getUsers } = require('../controllers/users');
+const { updateUser, getUser, getUserId, getUsers, getUsersWorkSpace } = require('../controllers/users');
 const { methodValidator } = require('../middlewares/methodValidator');
 
 users.get('/users/me', getUser);
@@ -27,5 +27,11 @@ users.post('/users', celebrate({
     surname: Joi.string().min(2).max(30),
   }),
 }), getUsers)
+
+users.post('/users-workspace', celebrate({
+  body: Joi.object().keys({
+    users: Joi.array().required()
+  }),
+}), getUsersWorkSpace)
 
 module.exports = { users };
