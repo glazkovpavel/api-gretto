@@ -13,17 +13,17 @@ const ForbiddenErr = require("../errors/forbidden-err");
 
 module.exports.updateWorkSpace = (req, res, next) => {
   WorkSpace.findById(req.params._id)
-    .then((workSpase) => {
-      if (!workSpase) {
-        throw new NotFoundError('Нет workSpase с таким id');
+    .then((workSpace) => {
+      if (!workSpace) {
+        throw new NotFoundError('Нет workSpace с таким id');
       }
       WorkSpace.findByIdAndUpdate(req.params._id,
         { $addToSet: { owner: req.body.id } },
         { new: true })
-        .then((workSpase) => {
-          if (workSpase !== null) {
-            res.send({ data: workSpase });
-          } else { throw new NotFoundError('Данного workSpase не существует'); }
+        .then((workSpace) => {
+          if (workSpace !== null) {
+            res.send( workSpace );
+          } else { throw new NotFoundError('Данного workSpace не существует'); }
         })
         .catch((err) => {
           if (err.name === 'CastError') {
