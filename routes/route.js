@@ -5,6 +5,7 @@ const { users } = require('./users');
 const { workSpace } = require('./work-space')
 const { journal } = require('./journal')
 const { tasks } = require('./task')
+const { todo } = require('./todo');
 
 const wrong = require('./wrong-requests');
 
@@ -16,6 +17,7 @@ routes.use('/', users);
 routes.use('/', workSpace);
 routes.use('/', tasks);
 routes.use('/', journal);
+routes.use('/', todo)
 routes.use('*', wrong);
 
 module.exports = { routes };

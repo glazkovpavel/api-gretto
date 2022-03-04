@@ -6,7 +6,6 @@ const workSpaceSchema = new mongoose.Schema({
   },
   _id: {
     type: String,
-    //unique: true,
   },
   list: [{
     titleList: {
