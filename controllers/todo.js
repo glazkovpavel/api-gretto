@@ -13,9 +13,10 @@ module.exports.getTodos = (req, res, next) => {
 }
 
 module.exports.createTodo = (req, res, next) => {
-  const todo = req.body;
+  const { title, isCompleted = false } = req.body;
+  const owner = req.user._id;
 
-  Todo.create(todo)
+  Todo.create({ title, isCompleted, owner })
     .then((todo) => res.status(201).send(todo))
     .catch((err) => {
       if (err.name === 'ValidationError') {

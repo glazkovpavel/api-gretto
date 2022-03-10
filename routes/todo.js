@@ -7,7 +7,7 @@ todo.get('/todos', getTodos);
 todo.post('/todo', celebrate({
   body: Joi.object().keys({
     title: Joi.string().required(),
-    isCompleted: Joi.boolean().required(),
+    isCompleted: Joi.boolean(),
   }),
 }), createTodo);
 
