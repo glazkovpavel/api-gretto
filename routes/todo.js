@@ -18,8 +18,12 @@ todo.post('/todo', celebrate({
 todo.patch('/todo', celebrate({
   body: Joi.object().keys({
     _id: Joi.string().required().length(24).hex(),
-    title: Joi.string().required(),
-    isCompleted: Joi.boolean(),
+    titleList: Joi.string(),
+    list: Joi.array().items({
+      titleTodo: Joi.string(),
+      isCompleted: Joi.boolean(),
+      _id: Joi.string().length(24).hex(),
+    }),
   }),
 }), updateTodo);
 
