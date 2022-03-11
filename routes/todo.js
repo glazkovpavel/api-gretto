@@ -1,4 +1,4 @@
-const {getTodos, createTodo, deleteTodoById} = require("../controllers/todo");
+const {getTodos, createTodo, deleteTodoById, updateTodo} = require("../controllers/todo");
 const {celebrate, Joi} = require("celebrate");
 const todo = require('express').Router();
 
@@ -11,9 +11,17 @@ todo.post('/todo', celebrate({
   }),
 }), createTodo);
 
+todo.patch('/todo', celebrate({
+  body: Joi.object().keys({
+    _id: Joi.string().required().length(24).hex(),
+    title: Joi.string().required(),
+    isCompleted: Joi.boolean(),
+  }),
+}), updateTodo);
+
 todo.delete('/todo/:todoId', celebrate({
   params: Joi.object().keys({
-    spaceId: Joi.string().required().length(24).hex(),
+    todoId: Joi.string().required().length(24).hex(),
   }),
 }), deleteTodoById);
 

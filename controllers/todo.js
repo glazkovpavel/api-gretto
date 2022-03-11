@@ -1,9 +1,14 @@
 const Todo = require('../models/todo');
 const BadRequestErr = require("../errors/bad-request-err");
-const {invalidDataErrorText, movieIdNotFoundErrorText, forbiddenErrorText} = require("../errors/error-text");
-const Task = require("../models/task");
+const {invalidDataErrorText, movieIdNotFoundErrorText, forbiddenErrorText,
+  userIdNotFoundText,
+  invalidUserIdErrorText,
+  duplicateEmailErrorText
+} = require("../errors/error-text");
 const NotFoundError = require("../errors/not-found-err");
 const ForbiddenErr = require("../errors/forbidden-err");
+const Task = require("../models/task");
+const ConflictErr = require("../errors/conflict-err");
 
 module.exports.getTodos = (req, res, next) => {
   const owner = req.user._id;
@@ -27,10 +32,39 @@ module.exports.createTodo = (req, res, next) => {
     .catch(next);
 }
 
+module.exports.updateTodo = (req, res, next) => {
+  const { _id } = req.body;
+  const  todo  = req.body;
+  todo.owner = req.user._id
+
+  Todo.findByIdAndUpdate(_id,  todo,
+    { upsert: true, new: true })
+    .then((todo) => {
+      if (!todo) {
+        throw new NotFoundError(userIdNotFoundText);
+      } else {
+        return res.status(200).send(todo);
+      }
+
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        throw new BadRequestErr(invalidDataErrorText);
+      } else if (err.name === 'CastError') {
+        throw new BadRequestErr(invalidUserIdErrorText);
+      } else if (err.codeName === 'DuplicateKey') {
+        throw new ConflictErr(duplicateEmailErrorText);
+      }
+      return next(err);
+    })
+    .catch(next);
+
+};
+
 module.exports.deleteTodoById = (req, res, next) => {
   const todo = {_id: req.params.todoId}
 
-  Task.findOne(todo).select('+owner')
+  Todo.findOne(todo).select('+owner')
     .then((todo) => {
       if (!todo) {
         throw new NotFoundError(movieIdNotFoundErrorText);
@@ -38,7 +72,7 @@ module.exports.deleteTodoById = (req, res, next) => {
         throw new ForbiddenErr(forbiddenErrorText);
       }
 
-      Task.findByIdAndDelete(todo).select('-owner')
+      Todo.findByIdAndDelete(todo).select('-owner')
         .then((deletedTodo) => res.status(200).send(deletedTodo));
     })
     .catch(next);
