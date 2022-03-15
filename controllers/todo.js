@@ -7,7 +7,6 @@ const {invalidDataErrorText, movieIdNotFoundErrorText, forbiddenErrorText,
 } = require("../errors/error-text");
 const NotFoundError = require("../errors/not-found-err");
 const ForbiddenErr = require("../errors/forbidden-err");
-const Task = require("../models/task");
 const ConflictErr = require("../errors/conflict-err");
 
 module.exports.getTodos = (req, res, next) => {
@@ -18,10 +17,10 @@ module.exports.getTodos = (req, res, next) => {
 }
 
 module.exports.createTodo = (req, res, next) => {
-  const { title, isCompleted = false } = req.body;
+  const { titleList } = req.body;
   const owner = req.user._id;
 
-  Todo.create({ title, isCompleted, owner })
+  Todo.create({ titleList, owner })
     .then((todo) => res.status(201).send(todo))
     .catch((err) => {
       if (err.name === 'ValidationError') {

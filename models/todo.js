@@ -1,12 +1,22 @@
 const mongoose = require('mongoose');
 
 const todoSchema = new mongoose.Schema({
-  title: {
+  titleList: {
     type: String,
   },
+  list: [{
+    titleTodo: {
+  type: String,
+},
   isCompleted: {
-    type: Boolean,
-  },
+  type: Boolean,
+},
+  // owner: {
+  // type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'user',
+  //   required: true,
+//}
+}],
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
