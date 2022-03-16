@@ -30,6 +30,10 @@ const workSpaceSchema = new mongoose.Schema({
     default: [],
     required: true,
   }],
+  holder: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
+  },
   createdAt: {
     type: Date,
     default: Date.now,

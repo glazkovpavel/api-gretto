@@ -79,6 +79,7 @@ module.exports.createWorkSpace = (req, res, next) => {
           })
           .catch(next);
       } else {
+        space.holder = req.user._id;
         WorkSpace.create( space, {"ordered" : false})
           .then((space) => res.status(201).send(space))
           .catch((err) => {
@@ -95,17 +96,18 @@ module.exports.createWorkSpace = (req, res, next) => {
 
 module.exports.deleteSpaceById = (req, res, next) => {
   const space = {_id: req.params.spaceId}
-
-  WorkSpace.findOne(space).select('+owner')
+  const holder = req.user._id
+  WorkSpace.findOne(space).select('+holder')
     .then((space) => {
       if (!space) {
         throw new NotFoundError(movieIdNotFoundErrorText);
-      } else if (space.owner.toString() !== req.user._id) {
+      } else if (space.holder.toString() === holder) {
+        WorkSpace.findByIdAndDelete(space).select('-holder')
+          .then((deletedMovie) => res.status(200).send(deletedMovie));
+      } else {
         throw new ForbiddenErr(forbiddenErrorText);
       }
 
-      WorkSpace.findByIdAndDelete(space).select('-owner')
-        .then((deletedMovie) => res.status(200).send(deletedMovie));
     })
     .catch(next);
 };
