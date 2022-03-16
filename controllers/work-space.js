@@ -34,6 +34,29 @@ module.exports.updateWorkSpace = (req, res, next) => {
     .catch(next);
 };
 
+module.exports.deleteUserWorkSpace = (req, res, next) => {
+  WorkSpace.findById(req.params._id)
+    .then((workSpace) => {
+      if (!workSpace) {
+        throw new NotFoundError('Нет workSpace с таким id');
+      }
+      WorkSpace.findByIdAndUpdate(req.params._id,
+        { $pull: { owner: req.body.id } },
+        { new: true })
+        .then((workSpace) => {
+          if (workSpace !== null) {
+            res.send( workSpace );
+          } else { throw new NotFoundError('Данного workSpace не существует'); }
+        })
+        .catch((err) => {
+          if (err.name === 'CastError') {
+            throw new BadRequestErr('Произошла ошибка валидации');
+          }
+        });
+    })
+    .catch(next);
+};
+
 
 module.exports.getWorkSpace = (req, res, next) => {
   const owner = req.user._id;
