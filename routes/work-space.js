@@ -8,6 +8,7 @@ workSpace.post('/work-space', celebrate({
   body: Joi.object().keys({
     _id: Joi.string(),
     title: Joi.string(),
+    holder: Joi.string(),
     list: Joi.array().items({
       _id: Joi.string(),
       titleList: Joi.string(),
