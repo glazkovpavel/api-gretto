@@ -31,8 +31,7 @@ const workSpaceSchema = new mongoose.Schema({
     required: true,
   }],
   holder: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
+    type: String
   },
   createdAt: {
     type: Date,

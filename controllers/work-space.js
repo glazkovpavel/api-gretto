@@ -69,7 +69,7 @@ module.exports.getWorkSpace = (req, res, next) => {
 }
 
 module.exports.createWorkSpace = (req, res, next) => {
-  const { _id } = req.body;
+  const { _id, title } = req.body;
   const  space  = req.body;
 
   if (!req.body.owner.length) {
@@ -102,7 +102,6 @@ module.exports.createWorkSpace = (req, res, next) => {
           })
           .catch(next);
       } else {
-        space.holder = req.user._id;
         WorkSpace.create( space, {"ordered" : false})
           .then((space) => res.status(201).send(space))
           .catch((err) => {
