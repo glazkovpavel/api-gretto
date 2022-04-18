@@ -3,7 +3,6 @@ require('dotenv').config();
 const { ADDRESS_BD, NODE_ENV } = process.env;
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const { errors } = require('celebrate');
 const cors = require('cors');
@@ -16,6 +15,12 @@ const mongoUrl = require('./middlewares/mongoUrl');
 const { PORT = 3000, BASE_PATH } = process.env;
 
 const app = express();
+
+const http = require('http');
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server);
+const bodyParser = require('body-parser');
 
 app.use('*', cors());
 
