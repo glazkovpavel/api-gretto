@@ -18,7 +18,7 @@ routes.use('/', users);
 routes.use('/', workSpace);
 routes.use('/', tasks);
 routes.use('/', journal);
-routes.use('/', todo)
+routes.use('/', todo);
 routes.use('/', chat);
 routes.use('*', wrong);
 

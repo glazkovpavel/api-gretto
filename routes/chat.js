@@ -1,11 +1,10 @@
 const chat = require('express').Router();
+const {app} = require('../app')
+const http = require('http');
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server);
 
-// const http = require('http');
-// const server = http.createServer(app);
-// const { Server } = require("socket.io");
-// const {app} = require("../app");
-
-const {io} = require('../app')
 
 chat.get('/chat', function (req, res) {
   req.sendFile(__dirname + './index.html');
@@ -23,4 +22,6 @@ io.sockets.on('connection', function (socket) {
     console.log('Отсоединение');
   })
 })
+
+module.exports = { chat };
 

@@ -16,10 +16,10 @@ const { PORT = 3000, BASE_PATH } = process.env;
 
 const app = express();
 
-const http = require('http');
-const server = http.createServer(app);
-const { Server } = require("socket.io");
-export const io = new Server(server);
+// const http = require('http');
+// const server = http.createServer(app);
+// const { Server } = require("socket.io");
+// const io = new Server(server);
 const bodyParser = require('body-parser');
 
 app.use('*', cors());
@@ -47,3 +47,5 @@ app.listen(PORT, () => {
   console.log(`"работает на ${PORT} порту`);
   console.log(BASE_PATH);
 });
+
+//module.exports =  app ;
