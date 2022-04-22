@@ -29,7 +29,9 @@
     "helmet": "^4.6.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.0.11",
+    "morgan": "^1.10.0",
     "socket.io": "^4.4.1",
+    "uuid": "^8.3.2",
     "validator": "^13.6.0",
     "winston": "^3.3.3"
   },
