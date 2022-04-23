@@ -6,7 +6,8 @@ const { workSpace } = require('./work-space')
 const { journal } = require('./journal')
 const { tasks } = require('./task')
 const { todo } = require('./todo');
-const { chat } = require('./chat');
+const { chat } = require('./chat/chatRoom');
+const { remove } = require('./chat/delete');
 
 const wrong = require('./wrong-requests');
 
@@ -20,6 +21,7 @@ routes.use('/', tasks);
 routes.use('/', journal);
 routes.use('/', todo);
 routes.use('/', chat);
+routes.use('/', remove);
 routes.use('*', wrong);
 
 module.exports = { routes };
