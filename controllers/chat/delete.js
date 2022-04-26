@@ -1,8 +1,8 @@
-import ChatRoomModel from '../../models/chat/chatRoom.js';
-import ChatMessageModel from '../../models/chat/chatMessage.js';
+const ChatRoomModel = require('../../models/chat/chatRoom.js');
+const ChatMessageModel = require('../../models/chat/chatMessage.js');
 
-export default {
-  deleteRoomById: async (req, res) => {
+
+  module.exports.deleteRoomById = async (req, res) => {
     try {
       const { roomId } = req.params;
       const room = await ChatRoomModel.remove({ _id: roomId });
@@ -16,8 +16,8 @@ export default {
     } catch (error) {
       return res.status(500).json({ success: false, error: error })
     }
-  },
-  deleteMessageById: async (req, res) => {
+  };
+  module.exports.deleteMessageById = async (req, res) => {
     try {
       const { messageId } = req.params;
       const message = await ChatMessageModel.remove({ _id: messageId });
@@ -28,5 +28,4 @@ export default {
     } catch (error) {
       return res.status(500).json({ success: false, error: error })
     }
-  },
-}
+  };

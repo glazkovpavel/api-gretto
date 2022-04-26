@@ -1,35 +1,34 @@
 // utils
-import makeValidation from '@withvoid/make-validation';
-// models
-import ChatRoomModel, { CHAT_ROOM_TYPES } from '../../models/chat/chatRoom';
-import ChatMessageModel from '../../models/chat/chatMessage.js';
-import userSchema from '../../models/user.js';
+const {makeValidation} = require('@withvoid/make-validation');// models
+const { ChatRoomModel, CHAT_ROOM_TYPES } = require('../../models/chat/chatRoom');
+const {ChatMessageModel} = require('../../models/chat/chatMessage.js');
+const {userSchema} = require('../../models/user.js');
 
-export default {
-  initiate: async (req, res) => {
-    try {
-      const validation = makeValidation(types => ({
-        payload: req.body,
-        checks: {
-          userIds: {
-            type: types.array,
-            options: { unique: true, empty: false, stringOnly: true }
-          },
-          type: { type: types.enum, options: { enum: CHAT_ROOM_TYPES } },
-        }
-      }));
-      if (!validation.success) return res.status(400).json({ ...validation });
 
-      const { userIds, type } = req.body;
-      const { userId: chatInitiator } = req;
-      const allUserIds = [...userIds, chatInitiator];
-      const chatRoom = await ChatRoomModel.initiateChat(allUserIds, type, chatInitiator);
-      return res.status(200).json({ success: true, chatRoom });
-    } catch (error) {
-      return res.status(500).json({ success: false, error: error })
-    }
-  },
-  postMessage: async (req, res) => {
+module.exports.initiate = async (req, res, next) => {
+  try {
+    // const validation = makeValidation(types => ({
+    //   payload: req.body,
+    //   checks: {
+    //     userIds: {
+    //       type: types.array,
+    //       options: {unique: true, empty: false, stringOnly: true}
+    //     },
+    //     type: {type: types.enum, options: {enum: CHAT_ROOM_TYPES}},
+    //   }
+    // }));
+    // if (!validation.success) return res.status(400).json({...validation});
+
+    const {userIds, type} = req.body;
+    const chatInitiator = req.user._id;
+    const allUserIds = [...userIds, chatInitiator];
+    const chatRoom = await ChatRoomModel.initiateChat(allUserIds, type, chatInitiator);
+    return res.status(200).json({success: true, chatRoom});
+  } catch (error) {
+    return res.status(500).send({error: error.message})
+  }
+};
+module.exports.postMessage = async (req, res) => {
     try {
       const { roomId } = req.params;
       const validation = makeValidation(types => ({
@@ -50,8 +49,8 @@ export default {
     } catch (error) {
       return res.status(500).json({ success: false, error: error })
     }
-  },
-  getRecentConversation: async (req, res) => {
+  };
+module.exports.getRecentConversation = async (req, res) => {
     try {
       const currentLoggedUser = req.userId;
       const options = {
@@ -67,8 +66,8 @@ export default {
     } catch (error) {
       return res.status(500).json({ success: false, error: error })
     }
-  },
-  getConversationByRoomId: async (req, res) => {
+  };
+module.exports.getConversationByRoomId = async (req, res) => {
     try {
       const { roomId } = req.params;
       const room = await ChatRoomModel.getChatRoomByRoomId(roomId)
@@ -92,10 +91,10 @@ export default {
     } catch (error) {
       return res.status(500).json({ success: false, error });
     }
-  },
-  markConversationReadByRoomId: async (req, res) => {
+  };
+  module.exports.markConversationReadByRoomId = async (req, res, next) => {
     try {
-      const { roomId } = req.params;
+      const {roomId} = req.params;
       const room = await ChatRoomModel.getChatRoomByRoomId(roomId)
       if (!room) {
         return res.status(400).json({
@@ -106,10 +105,9 @@ export default {
 
       const currentLoggedUser = req.userId;
       const result = await ChatMessageModel.markMessageRead(roomId, currentLoggedUser);
-      return res.status(200).json({ success: true, data: result });
+      return res.status(200).json({success: true, data: result});
     } catch (error) {
       console.log(error);
-      return res.status(500).json({ success: false, error });
+      return res.status(500).json({success: false, error});
     }
-  },
-}
+  }

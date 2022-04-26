@@ -4,8 +4,8 @@ const { ADDRESS_BD, NODE_ENV } = process.env;
 const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
-import socketio from "socket.io";
-import WebSockets from "./utils/webSocket";
+//import socketIo from "socket.io";
+const WebSockets = require("./utils/webSocket");
 const { errors } = require('celebrate');
 const cors = require('cors');
 const errorHanding = require('./middlewares/error');
@@ -18,7 +18,7 @@ const { PORT = 3000, BASE_PATH } = process.env;
 
 const app = express();
 
-import http from "http";
+const http = require('http');
 // const server = http.createServer(app);
 // const { Server } = require("socket.io");
 // const io = new Server(server);
@@ -46,9 +46,14 @@ app.use(errors());
 app.use(errorHanding);
 
 const server = http.createServer(app);
+// const server = http.createServer(app);
+// const { Server } = require("socket.io");
+// const io = new Server(server);
 /** Create socket connection */
-global.io = socketio.listen(server);
-global.io.on('connection', WebSockets.connection)
+//global.io = socketIo.Server;
+const { Server } = require("socket.io");
+const io = new Server(server);
+io.on('connection', WebSockets.connection)
 /** Event listener for HTTP server "listening" event. */
 server.on("listening", () => {
   console.log(`Listening on port:: http://localhost:${PORT}/`)

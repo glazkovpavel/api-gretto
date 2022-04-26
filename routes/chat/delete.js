@@ -1,10 +1,10 @@
 // controllers
-import deleteController from '../../controllers/chat/delete.js';
+const {deleteMessageById, deleteRoomById} = require('../../controllers/chat/delete.js');
 
 const remove = require('express').Router();
 
 remove
-  .delete('/room/:roomId', deleteController.deleteRoomById)
-  .delete('/message/:messageId', deleteController.deleteMessageById)
+  .delete('/room/:roomId', deleteRoomById)
+  .delete('/message/:messageId', deleteMessageById)
 
 module.exports = { remove };
