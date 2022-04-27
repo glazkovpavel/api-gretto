@@ -10,12 +10,7 @@ const todoSchema = new mongoose.Schema({
 },
   isCompleted: {
   type: Boolean,
-},
-  // owner: {
-  // type: mongoose.Schema.Types.ObjectId,
-  //   ref: 'user',
-  //   required: true,
-//}
+}
 }],
   owner: {
     type: mongoose.Schema.Types.ObjectId,

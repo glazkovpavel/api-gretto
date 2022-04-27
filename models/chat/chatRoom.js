@@ -14,9 +14,15 @@ const chatRoomSchema = new mongoose.Schema(
       type: String,
       default: () => uuidv4().replace(/\-/g, ""),
     },
-    userIds: Array,
-    type: String,
-    chatInitiator: String,
+    userIds: [{
+        type: String,
+    }],
+    type: {
+      type: String,
+    },
+    chatInitiator: {
+      type: String,
+    },
   },
   {
     timestamps: true,
