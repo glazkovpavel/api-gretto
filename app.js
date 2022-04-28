@@ -52,8 +52,8 @@ const server = http.createServer(app);
 /** Create socket connection */
 //global.io = socketIo.Server;
 const { Server } = require("socket.io");
-const io = new Server(server);
-io.on('connection', WebSockets.connection)
+global.io = new Server(server);
+global.io.on('connection', WebSockets.connection)
 /** Event listener for HTTP server "listening" event. */
 server.on("listening", () => {
   console.log(`Listening on port:: http://localhost:${PORT}/`)

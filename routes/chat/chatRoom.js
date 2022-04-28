@@ -4,12 +4,12 @@ const {
   getRecentConversation,
   getConversationByRoomId,
   markConversationReadByRoomId,
-  initiate,
-  postMessage} = require('../../controllers/chat/chatRoom.js');
+  initiate} = require('../../controllers/chat/chatRoom.js');
 
 const {
   createRoom,
   getChatRoomByRoomId,
+  postMessage,
   getChatRoomsByUserId} = require('../../controllers/chat/chatRoomNew.js');
 
 chat
