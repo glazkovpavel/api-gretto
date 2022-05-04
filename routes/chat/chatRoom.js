@@ -3,14 +3,14 @@ const chat = require('express').Router();
 const {
   getRecentConversation,
   getConversationByRoomId,
-  markConversationReadByRoomId,
   initiate} = require('../../controllers/chat/chatRoom.js');
 
 const {
   createRoom,
   getChatRoomByRoomId,
   postMessage,
-  getChatRoomsByUserId} = require('../../controllers/chat/chatRoomNew.js');
+  getChatRoomsByUserId,
+  markConversationReadByRoomId} = require('../../controllers/chat/chatRoomNew.js');
 
 chat
   .get('/chat', getChatRoomsByUserId)

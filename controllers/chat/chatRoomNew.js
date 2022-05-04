@@ -4,13 +4,13 @@ const BadRequestErr = require("../../errors/bad-request-err");
 const {invalidDataErrorText} = require("../../errors/error-text");
 
 module.exports.postMessage = (req, res, next) => {
-  const { chatRoomId } = req.params;
+  const { roomId } = req.params;
   const message = {
     messageText: req.body.messageText,
   };
   const postedByUser = req.user._id;
   const readByRecipients = { readByUserId: postedByUser }
-  ChatMessageNew.create({chatRoomId, message, postedByUser, readByRecipients})
+  ChatMessageNew.create({roomId, message, postedByUser, readByRecipients})
     .then((post) => {
       const aggregate = ChatMessageNew.aggregate(
         [
@@ -28,11 +28,11 @@ module.exports.postMessage = (req, res, next) => {
           },
           { $unwind: '$postedByUser' },
           // do a join on another table called chatrooms, and
-          // get me a chatroom whose _id = chatRoomId
+          // get me a chatroom whose _id = roomId
           {
             $lookup: {
               from: 'chatrooms',
-              localField: 'chatRoomId',
+              localField: 'roomId',
               foreignField: '_id',
               as: 'chatRoomInfo',
             }
@@ -55,7 +55,7 @@ module.exports.postMessage = (req, res, next) => {
             $group: {
               _id: '$chatRoomInfo._id',
               postId: { $last: '$_id' },
-              chatRoomId: { $last: '$chatRoomInfo._id' },
+              roomId: { $last: '$chatRoomInfo._id' },
               message: { $last: '$message' },
               type: { $last: '$type' },
               postedByUser: { $last: '$postedByUser' },
@@ -67,11 +67,9 @@ module.exports.postMessage = (req, res, next) => {
           }
         ])
       res.status(200).send({ success: true, post: aggregate[0], message: post });
-      global.io.sockets.in(chatRoomId).emit('new message', { message: post });
+      global.io.sockets.in(roomId).emit('new message', { message: post });
       }
     )
-
-
 
 
 };
@@ -116,12 +114,12 @@ module.exports.getChatRoomsByUserId = (req, res, next) => {
        * @param {String} currentUserOnlineId - user id
        */
       const recentConversation =  ChatMessageNew.aggregate([
-        { $match: { chatRoomId: { $in: roomIds } } },
+        { $match: { roomId: { $in: roomIds } } },
         {
           $group: {
-            _id: '$chatRoomId',
+            _id: 'roomId',
             messageId: { $last: '$_id' },
-            chatRoomId: { $last: '$chatRoomId' },
+            roomId: { $last: 'roomId' },
             message: { $last: '$message' },
             type: { $last: '$type' },
             postedByUser: { $last: '$postedByUser' },
@@ -177,7 +175,7 @@ module.exports.getChatRoomsByUserId = (req, res, next) => {
           $group: {
             _id: '$roomInfo._id',
             messageId: { $last: '$messageId' },
-            chatRoomId: { $last: '$chatRoomId' },
+            roomId: { $last: 'roomId' },
             message: { $last: '$message' },
             type: { $last: '$type' },
             postedByUser: { $last: '$postedByUser' },
@@ -195,6 +193,39 @@ module.exports.getChatRoomsByUserId = (req, res, next) => {
     }
     )
     .catch(next)
+
+}
+
+module.exports.markConversationReadByRoomId = (req, res, next) => {
+    const {roomId} = req.params;
+  const currentUserOnlineId = req.user._id;
+  ChatRoomNew.findOne({_id: roomId})
+    .then((roomId) => {
+      ChatRoomNew.updateMany(
+        {
+          roomId,
+          'readByRecipients.readByUserId': { $ne: currentUserOnlineId }
+        },
+        {
+          $addToSet: {
+            readByRecipients: { readByUserId: currentUserOnlineId }
+          }
+        },
+        {
+          multi: true
+        }
+      )
+        .then((result) => res.status(200).json({success: true, data: result}))
+        .catch((err) => {
+          if (err.name === 'ValidationError') {
+            throw new BadRequestErr(invalidDataErrorText);
+          }
+          return next(err);
+        })
+        .catch(next);
+    })
+
+
 
 }
 

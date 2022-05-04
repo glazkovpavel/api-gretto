@@ -27,7 +27,7 @@ const chatMessageSchema = new mongoose.Schema(
       type: String,
       default: () => uuidv4().replace(/\-/g, ""),
     },
-    chatRoomId: {
+    roomId: {
       type: String,
     },
     message: {
