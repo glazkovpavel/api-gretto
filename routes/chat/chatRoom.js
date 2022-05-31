@@ -1,11 +1,6 @@
 const chat = require('express').Router();
 // controllers
 const {
-  getRecentConversation,
-  getConversationByRoomId,
-  initiate} = require('../../controllers/chat/chatRoom.js');
-
-const {
   createRoom,
   getChatRoomByRoomId,
   postMessage,

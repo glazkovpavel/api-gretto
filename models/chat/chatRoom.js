@@ -20,6 +20,9 @@ const chatRoomSchema = new mongoose.Schema(
     type: {
       type: String,
     },
+    name: {
+      type: String,
+    },
     chatInitiator: {
       type: String,
     },

@@ -52,7 +52,9 @@ const server = http.createServer(app);
 /** Create socket connection */
 //global.io = socketIo.Server;
 const { Server } = require("socket.io");
-global.io = new Server(server);
+global.io = new Server(server, {
+  path: "/chat"
+});
 global.io.on('connection', WebSockets.connection)
 /** Event listener for HTTP server "listening" event. */
 server.on("listening", () => {
