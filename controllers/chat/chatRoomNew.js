@@ -75,11 +75,11 @@ module.exports.postMessage = (req, res, next) => {
 };
 
 module.exports.createRoom = (req, res, next) => {
-  const {arrayUsers, title} = req.body;
+  const {users, title, kind} = req.body;
   const chatInitiator = req.user._id;
-  const userIds = [...arrayUsers, chatInitiator];
+  const userIds = [...users, chatInitiator];
 
-  ChatRoomNew.create({userIds, chatInitiator, title})
+  ChatRoomNew.create({userIds, chatInitiator, title, kind})
     .then((chat) => res.status(201).send(chat))
     .catch((err) => {
       if (err.name === 'ValidationError') {

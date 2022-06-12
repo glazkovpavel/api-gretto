@@ -11,6 +11,9 @@ const chatRoomSchema = new mongoose.Schema(
     title: {
       type: String,
     },
+    kind: {
+      type: Number,
+    },
     userIds: [{
       type: String,
     }],
