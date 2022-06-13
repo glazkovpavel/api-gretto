@@ -113,11 +113,13 @@ module.exports.getChatRoomsByUserId = (req, res, next) => {
        * @param {{ page, limit }} options - pagination options
        * @param {String} currentUserOnlineId - user id
        */
-      const recentConversation =  ChatMessageNew.aggregate([
+      const recentConversation = ChatMessageNew.aggregate([
         { $match: { roomId: { $in: roomIds } } },
         {
           $group: {
             _id: 'roomId',
+            title: 'title',
+            title2: {$last: 'title'},
             messageId: { $last: '$_id' },
             roomId: { $last: 'roomId' },
             message: { $last: '$message' },
@@ -132,7 +134,7 @@ module.exports.getChatRoomsByUserId = (req, res, next) => {
         // get me a user whose _id = postedByUser
         {
           $lookup: {
-            from: 'users',
+            from: 'user',
             localField: 'postedByUser',
             foreignField: '_id',
             as: 'postedByUser',
@@ -188,7 +190,7 @@ module.exports.getChatRoomsByUserId = (req, res, next) => {
         { $skip: options.page * options.limit },
         { $limit: options.limit },
       ])
-        res.status(200).json({ success: true, conversation: recentConversation });
+        res.status(200).json(rooms);
 
     }
     )
