@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const  {v4}  = require("uuid");
 const uuidv4 = v4
-//const  v4 as uuidv4  = require("uuid");
 
 const MESSAGE_TYPES = {
   TYPE_TEXT: "text",
