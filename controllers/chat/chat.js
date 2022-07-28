@@ -1,15 +1,15 @@
 const ChatRoomNew = require("../../models/chat/chatRoomNew");
 const BadRequestErr = require("../../errors/bad-request-err");
 const {invalidDataErrorText,
-  userIdNotFoundText,
   invalidUserIdErrorText,
-  duplicateEmailErrorText
+  movieIdNotFoundErrorText,
+  forbiddenErrorText,
 } = require("../../errors/error-text");
 const NotFoundError = require("../../errors/not-found-err");
-const ConflictErr = require("../../errors/conflict-err");
+const ForbiddenErr = require("../../errors/forbidden-err");
 
 // Добавляем новый чат в рабочее пространство
-module.exports.updateChatRoom = (req, res, next) => {
+module.exports.createChatInRoom = (req, res, next) => {
   const  chat  = req.body;
   const  _id  = req.params.roomId;
   const chatInitiator = req.user._id;
@@ -24,10 +24,29 @@ module.exports.updateChatRoom = (req, res, next) => {
         throw new BadRequestErr(invalidDataErrorText);
       } else if (err.name === 'CastError') {
         throw new BadRequestErr(invalidUserIdErrorText);
-      } else if (err.codeName === 'DuplicateKey') {
-        throw new ConflictErr(duplicateEmailErrorText);
       }
       return next(err);
+    })
+    .catch(next);
+}
+
+// Удаляем чат из рабочего пространства
+module.exports.deleteChatInRoom = (req, res, next) => {
+  const  chatDelete  = req.body.chat;
+  const  _id  = req.params.roomId;
+  const chatInitiator = req.user._id;
+  ChatRoomNew.findById(_id).select('+chatInitiator')
+    .then((chat) => {
+      if (!chat) {
+        throw new NotFoundError(movieIdNotFoundErrorText);
+      } else if (chat.chatInitiator.toString() === chatInitiator) {
+        ChatRoomNew.findByIdAndUpdate({_id},
+          {$pull: {"chats": {"_id": chatDelete.id}}},
+          { upsert: true, new: true }).select('-chatInitiator')
+          .then((deletedChat) => res.status(200).send(deletedChat));
+      } else {
+        throw new ForbiddenErr(forbiddenErrorText);
+      }
     })
     .catch(next);
 }
