@@ -1,12 +1,5 @@
 const ChatRoomModel = require('../../models/chat/chatRoom.js');
 const ChatMessageModel = require('../../models/chat/chatMessage.js');
-const ChatRoomNew = require("../../models/chat/chatRoomNew");
-const BadRequestErr = require("../../errors/bad-request-err");
-const {invalidDataErrorText, invalidUserIdErrorText, movieIdNotFoundErrorText, forbiddenErrorText} = require("../../errors/error-text");
-const WorkSpace = require("../../models/work-space");
-const NotFoundError = require("../../errors/not-found-err");
-const ForbiddenErr = require("../../errors/forbidden-err");
-
 
   module.exports.deleteRoomById = async (req, res) => {
     try {
