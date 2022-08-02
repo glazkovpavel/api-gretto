@@ -1,4 +1,5 @@
 const ChatRoomNew = require("../../models/chat/chatRoomNew");
+const Chat = require("../../models/chat/chat");
 const BadRequestErr = require("../../errors/bad-request-err");
 const {invalidDataErrorText,
   invalidUserIdErrorText,
@@ -15,18 +16,24 @@ module.exports.createChatInRoom = (req, res, next) => {
   const chatInitiator = req.user._id;
   chat.chatInitiator = chatInitiator;
   chat.users = [...chat.users, chatInitiator];
-  ChatRoomNew.findByIdAndUpdate({_id}, {$addToSet: {chats: chat}}, { upsert: true, new: true })
-    .then((chats) => {
-      return res.status(200).send(chats);
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        throw new BadRequestErr(invalidDataErrorText);
-      } else if (err.name === 'CastError') {
-        throw new BadRequestErr(invalidUserIdErrorText);
-      }
-      return next(err);
-    })
+  Chat.create(chat)
+    .then((item) =>
+      ChatRoomNew.findByIdAndUpdate({_id}, {$addToSet: {chats: item}}, { upsert: true, new: true })
+        .then((chats) => {
+           ChatRoomNew.findById({_id})
+            .populate('chats')
+            .then(chat => res.send({ data: chat }));
+          //return res.status(200).send(chats);
+        })
+        .catch((err) => {
+          if (err.name === 'ValidationError') {
+            throw new BadRequestErr(invalidDataErrorText);
+          } else if (err.name === 'CastError') {
+            throw new BadRequestErr(invalidUserIdErrorText);
+          }
+          return next(err);
+        }))
+
     .catch(next);
 }
 

@@ -1,38 +1,7 @@
 const mongoose = require('mongoose');
-const  {v4}  = require("uuid");
-const uuidv4 = v4
-
-const chatSchema = new mongoose.Schema(
-  {
-    _id: {
-      type: String,
-      default: () => uuidv4().replace(/\-/g, ""),
-    },
-    title: {
-      type: String,
-    },
-    kind: {
-      type: Number,
-    },
-    users: [{
-      type: String,
-    }],
-    chatInitiator: {
-      type: String,
-    },
-  },
-  {
-    timestamps: true,
-    collection: "chat",
-  }
-);
 
 const chatRoomSchema = new mongoose.Schema(
   {
-    _id: {
-      type: String,
-      default: () => uuidv4().replace(/\-/g, ""),
-    },
     title: {
       type: String,
     },
@@ -45,7 +14,12 @@ const chatRoomSchema = new mongoose.Schema(
     chatInitiator: {
       type: String,
     },
-    chats: [chatSchema]
+    chats: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Chat',
+      }
+    ]
   },
   {
     timestamps: true,
