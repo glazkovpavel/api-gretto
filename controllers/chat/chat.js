@@ -22,7 +22,7 @@ module.exports.createChatInRoom = (req, res, next) => {
         .then((chats) => {
            ChatRoomNew.findById({_id})
             .populate('chats')
-            .then(chat => res.send({ data: chat }));
+            .then(chat => res.send(chat));
           //return res.status(200).send(chats);
         })
         .catch((err) => {
@@ -47,9 +47,7 @@ module.exports.deleteChatInRoom = (req, res, next) => {
       if (!chat) {
         throw new NotFoundError(movieIdNotFoundErrorText);
       } else if (chat.chatInitiator.toString() === chatInitiator) {
-        ChatRoomNew.findByIdAndUpdate({_id},
-          {$pull: {"chats": {"_id": chatDelete.id}}},
-          { upsert: true, new: true }).select('-chatInitiator')
+        Chat.findByIdAndDelete({_id: chatDelete.id}).select('-chatInitiator')
           .then((deletedChat) => res.status(200).send(deletedChat));
       } else {
         throw new ForbiddenErr(forbiddenErrorText);
