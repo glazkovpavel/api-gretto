@@ -9,7 +9,8 @@ const chatSchema = new mongoose.Schema(
       type: Number,
     },
     users: [{
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'user',
     }],
     chatInitiator: {
       type: String,
