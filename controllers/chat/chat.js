@@ -19,12 +19,9 @@ module.exports.createChatInRoom = (req, res, next) => {
   Chat.create(chat)
     .then((item) =>
       ChatRoomNew.findByIdAndUpdate({_id}, {$addToSet: {chats: item}}, { upsert: true, new: true })
-        .then((chats) => {
-           ChatRoomNew.findById({_id})
-            .populate('chats')
-            .then(chat => res.send(chat));
-          //return res.status(200).send(chats);
-        })
+        .populate('chats')
+        .then((chats) => res.send(chats)
+        )
         .catch((err) => {
           if (err.name === 'ValidationError') {
             throw new BadRequestErr(invalidDataErrorText);
@@ -39,15 +36,15 @@ module.exports.createChatInRoom = (req, res, next) => {
 
 // Удаляем чат из рабочего пространства
 module.exports.deleteChatInRoom = (req, res, next) => {
-  const  chatDelete  = req.body.chat;
-  const  _id  = req.params.roomId;
+  const chatDelete  = req.body.chat;
+  const _id  = req.params.roomId;
   const chatInitiator = req.user._id;
   ChatRoomNew.findById(_id).select('+chatInitiator')
     .then((chat) => {
       if (!chat) {
         throw new NotFoundError(movieIdNotFoundErrorText);
       } else if (chat.chatInitiator.toString() === chatInitiator) {
-        Chat.findByIdAndDelete({_id: chatDelete.id}).select('-chatInitiator')
+        Chat.findByIdAndDelete({_id: chatDelete._id}).select('-chatInitiator')
           .then((deletedChat) => res.status(200).send(deletedChat));
       } else {
         throw new ForbiddenErr(forbiddenErrorText);
@@ -56,3 +53,46 @@ module.exports.deleteChatInRoom = (req, res, next) => {
     .catch(next);
 }
 
+// Добавляем пользователя в рабочее в чат
+
+module.exports.addUserInChat = (req, res, next) => {
+  const user = req.body.user;
+  const chatAdd = req.body.chat;
+  const chatInitiator = req.user._id;
+  const _id = chatAdd._id;
+
+  Chat.findById(_id)
+    .then((chat) => {
+      if (!chat) {
+        throw new NotFoundError(movieIdNotFoundErrorText);
+      } else if (chat.chatInitiator.toString() === chatInitiator || chat.kind === 0) {
+        Chat.findByIdAndUpdate({_id}, {$addToSet: {users: user._id}}, { upsert: true, new: true })
+          .then((item) => res.status(200).send(item));
+      } else {
+        throw new ForbiddenErr(forbiddenErrorText);
+      }
+    })
+    .catch(next);
+}
+
+// Удаляем пользователя из чата
+
+module.exports.deleteUserInChat = (req, res, next) => {
+  const user = req.body.user;
+  const chatAdd = req.body.chat;
+  const chatInitiator = req.user._id;
+  const _id = chatAdd._id;
+
+  Chat.findById(_id)
+    .then((chat) => {
+      if (!chat) {
+        throw new NotFoundError(movieIdNotFoundErrorText);
+      } else if (chat.chatInitiator.toString() === chatInitiator || chat.kind === 0) {
+        Chat.findByIdAndUpdate({_id}, {$pull: {users: user._id}}, { upsert: true, new: true })
+          .then((item) => res.status(200).send(item));
+      } else {
+        throw new ForbiddenErr(forbiddenErrorText);
+      }
+    })
+    .catch(next);
+}

@@ -1,10 +1,13 @@
 const ChatRoomModel = require('../../models/chat/chatRoom.js');
 const ChatMessageModel = require('../../models/chat/chatMessage.js');
+const ChatRoomNew = require("../../models/chat/chatRoomNew");
 
+// Удаление рабочего пространства
   module.exports.deleteRoomById = async (req, res) => {
     try {
       const { roomId } = req.params;
-      const room = await ChatRoomModel.remove({ _id: roomId });
+      // сделать удаление чатов из БД
+      const room = await ChatRoomNew.remove({ _id: roomId });
       const messages = await ChatMessageModel.remove({ chatRoomId: roomId })
       return res.status(200).json({
         success: true,

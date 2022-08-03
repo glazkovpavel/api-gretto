@@ -6,7 +6,12 @@ const {
   postMessage,
   getChatRoomsByUserId,
   markConversationReadByRoomId} = require('../../controllers/chat/chatRoomNew.js');
-const {createChatInRoom, deleteChatInRoom} = require("../../controllers/chat/chat");
+const {
+  createChatInRoom,
+  deleteChatInRoom,
+  addUserInChat,
+  deleteUserInChat
+} = require("../../controllers/chat/chat");
 
 chat
   .get('/chat', getChatRoomsByUserId)
@@ -15,6 +20,8 @@ chat
   .post('/chat/:roomId/message', postMessage)
   .patch('/chat/:roomId', createChatInRoom)
   .patch('/chat-delete/:roomId', deleteChatInRoom)
+  .patch('/chat-add-user', addUserInChat)
+  .patch('/chat-delete-user', deleteUserInChat)
   .put('/chat/:roomId/mark-read', markConversationReadByRoomId) //пометить беседу как прочитанную по RoomId
 
 module.exports = { chat };
