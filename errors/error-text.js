@@ -1,5 +1,6 @@
 const invalidDataErrorText = 'Произошла ошибка валидации';
 const forbiddenErrorText = 'Нет прав, нельзя удалять ресурсы других пользователей';
+const forbiddenErrorTextDeleteOwner = 'Нет прав, нельзя удалить владельца чата';
 const invalidUserIdErrorText = 'Введен невалидный id пользователя';
 const userIdNotFoundText = 'Нет пользователя с таким id';
 const movieIdNotFoundErrorText = 'Запрашиваемый ресурс не найден';
@@ -16,4 +17,5 @@ module.exports = {
   duplicateEmailErrorText,
   wrongCredentialsErrorText,
   unauthorizedErrorText,
+  forbiddenErrorTextDeleteOwner,
 };

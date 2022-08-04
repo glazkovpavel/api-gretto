@@ -5,6 +5,7 @@ const {invalidDataErrorText,
   invalidUserIdErrorText,
   movieIdNotFoundErrorText,
   forbiddenErrorText,
+  forbiddenErrorTextDeleteOwner
 } = require("../../errors/error-text");
 const NotFoundError = require("../../errors/not-found-err");
 const ForbiddenErr = require("../../errors/forbidden-err");
@@ -78,17 +79,19 @@ module.exports.addUserInChat = (req, res, next) => {
 // Удаляем пользователя из чата
 
 module.exports.deleteUserInChat = (req, res, next) => {
-  const user = req.body.user;
-  const chatAdd = req.body.chat;
-  const chatInitiator = req.user._id;
-  const _id = chatAdd._id;
+  const userDelete = req.body.user;
+  const chatDelete = req.body.chat;
+  const chatDeleteInitiator = req.user._id;
+  const _id = chatDelete._id;
 
   Chat.findById(_id)
     .then((chat) => {
       if (!chat) {
         throw new NotFoundError(movieIdNotFoundErrorText);
-      } else if (chat.chatInitiator.toString() === chatInitiator || chat.kind === 0) {
-        Chat.findByIdAndUpdate({_id}, {$pull: {users: user._id}}, { upsert: true, new: true })
+      } else if (chat.chatInitiator.toString() === userDelete._id) {
+        throw new ForbiddenErr(forbiddenErrorTextDeleteOwner);
+      } else if (chat.chatInitiator.toString() === chatDeleteInitiator || chat.kind === 0) {
+        Chat.findByIdAndUpdate({_id}, {$pull: {users: userDelete._id}}, { upsert: true, new: true })
           .then((item) => res.status(200).send(item));
       } else {
         throw new ForbiddenErr(forbiddenErrorText);
