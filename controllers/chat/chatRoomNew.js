@@ -1,5 +1,6 @@
 const ChatRoomNew = require("../../models/chat/chatRoomNew");
 const ChatMessageNew = require("../../models/chat/chatMessageNew");
+const Chat = require("../../models/chat/chat");
 const BadRequestErr = require("../../errors/bad-request-err");
 const {invalidDataErrorText} = require("../../errors/error-text");
 
@@ -104,11 +105,21 @@ module.exports.getChatRoomsByUserId = (req, res, next) => {
     page: parseInt(req.query.page) || 0,
     limit: parseInt(req.query.limit) || 10,
   };
-
   ChatRoomNew.find({ allUserIds: { $all: [userId] } })
     .populate('chats')
     .then((rooms) => {
       const roomIds = rooms.map(room => room._id);
+      Chat.find({userId})
+        .then((chats) => {
+          const roomAllChat = {
+            _id: 'no id',
+            chats: chats,
+            title: 'Все чаты',
+            updatedAt: 0,
+          }
+          rooms.unshift(roomAllChat)
+          res.status(200).json(rooms);
+        })
       /**
        * @param {Array} roomIds - chat room ids
        * @param {{ page, limit }} options - pagination options
@@ -191,7 +202,6 @@ module.exports.getChatRoomsByUserId = (req, res, next) => {
         { $skip: options.page * options.limit },
         { $limit: options.limit },
       ])
-        res.status(200).json(rooms);
 
     }
     )
