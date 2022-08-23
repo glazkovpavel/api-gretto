@@ -2,7 +2,13 @@ const ChatRoomNew = require("../../models/chat/chatRoomNew");
 const ChatMessageNew = require("../../models/chat/chatMessageNew");
 const Chat = require("../../models/chat/chat");
 const BadRequestErr = require("../../errors/bad-request-err");
-const {invalidDataErrorText} = require("../../errors/error-text");
+const {invalidDataErrorText, invalidUserIdErrorText,
+  movieIdNotFoundErrorText,
+  forbiddenErrorTextDeleteOwner,
+  forbiddenErrorText
+} = require("../../errors/error-text");
+const NotFoundError = require("../../errors/not-found-err");
+const ForbiddenErr = require("../../errors/forbidden-err");
 
 module.exports.postMessage = (req, res, next) => {
   const { roomId } = req.params;
@@ -76,11 +82,10 @@ module.exports.postMessage = (req, res, next) => {
 };
 
 module.exports.createRoom = (req, res, next) => {
-  const {users, title, kind} = req.body;
+  const {title} = req.body;
   const chatInitiator = req.user._id;
-  const userIds = [...users, chatInitiator];
 
-  ChatRoomNew.create({userIds, chatInitiator, title, kind})
+  ChatRoomNew.create({ chatInitiator, title})
     .then((chat) => res.status(201).send(chat))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -99,6 +104,61 @@ module.exports.getChatRoomByRoomId = (req, res, next) => {
     .catch(next)
 }
 
+module.exports.getChatByUserId = (req, res, next) => {
+  const userId = req.user._id;
+    Chat.find({userId})
+    .then((chats) => {
+      ChatRoomNew.find({userId})
+        .then((rooms) => {
+          //const roomIds = rooms.map(room => room._id);
+          return res.status(200).send({chats, rooms})
+        })
+        .catch(next)
+      }
+    )
+    .catch(next)
+
+}
+
+// Добавляем id чата в room
+module.exports.addChatInRoom = (req, res, next) => {
+  const idRoom = req.params.roomId;
+  const idChat = req.body.chat._id;
+
+  ChatRoomNew.findByIdAndUpdate({idRoom}, {$addToSet: {chats: idChat}}, { upsert: true, new: true })
+    .then((item) => res.status(200).send(item))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        throw new BadRequestErr(invalidDataErrorText);
+      } else if (err.name === 'CastError') {
+        throw new BadRequestErr(invalidUserIdErrorText);
+      }
+      return next(err);
+    })
+
+    .catch(next);
+
+};
+
+// Удаляем id чата из room
+module.exports.deleteChatInRoom = (req, res, next) => {
+  const idRoom = req.params.roomId;
+  const idChat = req.body.chat._id;
+
+  ChatRoomNew.findByIdAndUpdate({idRoom}, {$pull: {chats: idChat}}, { upsert: true, new: true })
+    .then((item) => res.status(200).send(item))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        throw new BadRequestErr(invalidDataErrorText);
+      } else if (err.name === 'CastError') {
+        throw new BadRequestErr(invalidUserIdErrorText);
+      }
+      return next(err);
+    })
+
+    .catch(next);
+};
+
 module.exports.getChatRoomsByUserId = (req, res, next) => {
   const userId = req.user._id;
   const options = {
@@ -108,11 +168,11 @@ module.exports.getChatRoomsByUserId = (req, res, next) => {
   ChatRoomNew.find({ allUserIds: { $all: [userId] } })
     .populate('chats')
     .then((rooms) => {
-      const roomIds = rooms.map(room => room._id);
+      //const roomIds = rooms.map(room => room._id);
       Chat.find({userId})
         .then((chats) => {
           const roomAllChat = {
-            _id: 'no id',
+            _id: '0',
             chats: chats,
             title: 'Все чаты',
             updatedAt: 0,

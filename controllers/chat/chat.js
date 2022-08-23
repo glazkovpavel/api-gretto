@@ -11,37 +11,31 @@ const {
 const NotFoundError = require("../../errors/not-found-err");
 const ForbiddenErr = require("../../errors/forbidden-err");
 
-// Добавляем новый чат в рабочее пространство
+// Создаём чат
 module.exports.createChatInRoom = (req, res, next) => {
-  const  chat  = req.body;
-  const  _id  = req.params.roomId;
+  const chat = req.body;
   const chatInitiator = req.user._id;
   chat.chatInitiator = chatInitiator;
   chat.users = [...chat.users, chatInitiator];
   Chat.create(chat)
-    .then((item) =>
-      ChatRoomNew.findByIdAndUpdate({_id}, {$addToSet: {chats: item}}, { upsert: true, new: true })
-        .populate('chats')
-        .then((chats) => res.send(chats)
-        )
-        .catch((err) => {
-          if (err.name === 'ValidationError') {
-            throw new BadRequestErr(invalidDataErrorText);
-          } else if (err.name === 'CastError') {
-            throw new BadRequestErr(invalidUserIdErrorText);
-          }
-          return next(err);
-        }))
+    .then((item) => res.status(201).send(item))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        throw new BadRequestErr(invalidDataErrorText);
+      } else if (err.name === 'CastError') {
+        throw new BadRequestErr(invalidUserIdErrorText);
+      }
+      return next(err);
+    })
 
     .catch(next);
 }
 
-// Удаляем чат из рабочего пространства
-module.exports.deleteChatInRoom = (req, res, next) => {
+// Удаляем чат
+module.exports.deleteChat = (req, res, next) => {
   const chatDelete  = req.body.chat;
-  const _id  = req.params.roomId;
   const chatInitiator = req.user._id;
-  ChatRoomNew.findById(_id).select('+chatInitiator')
+  Chat.findById(chatDelete._id).select('+chatInitiator')
     .then((chat) => {
       if (!chat) {
         throw new NotFoundError(movieIdNotFoundErrorText);
@@ -55,7 +49,7 @@ module.exports.deleteChatInRoom = (req, res, next) => {
     .catch(next);
 }
 
-// Добавляем пользователя в рабочее в чат
+// Добавляем пользователя в чат
 
 module.exports.addUserInChat = (req, res, next) => {
   const user = req.body.user;
