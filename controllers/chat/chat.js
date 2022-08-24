@@ -72,7 +72,6 @@ module.exports.addUserInChat = (req, res, next) => {
 }
 
 // Удаляем пользователя из чата
-
 module.exports.deleteUserInChat = (req, res, next) => {
   const userDelete = req.body.user;
   const chatDelete = req.body.chat;

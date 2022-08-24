@@ -7,8 +7,8 @@ const ChatRoomNew = require("../../models/chat/chatRoomNew");
     try {
       const { roomId } = req.params;
       // сделать удаление чатов из БД
-      const room = await ChatRoomNew.remove({ _id: roomId });
-      const messages = await ChatMessageModel.remove({ chatRoomId: roomId })
+      const room = await ChatRoomNew.deleteOne({ _id: roomId });
+      const messages = await ChatMessageModel.deleteOne({ chatRoomId: roomId })
       return res.status(200).json({
         success: true,
         message: "Operation performed succesfully",

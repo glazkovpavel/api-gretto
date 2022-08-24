@@ -109,6 +109,7 @@ module.exports.getChatByUserId = (req, res, next) => {
     Chat.find({userId})
     .then((chats) => {
       ChatRoomNew.find({userId})
+        .populate('chats')
         .then((rooms) => {
           //const roomIds = rooms.map(room => room._id);
           return res.status(200).send({chats, rooms})
@@ -122,10 +123,11 @@ module.exports.getChatByUserId = (req, res, next) => {
 
 // Добавляем id чата в room
 module.exports.addChatInRoom = (req, res, next) => {
-  const idRoom = req.params.roomId;
+  const _id = req.params.roomId;
   const idChat = req.body.chat._id;
 
-  ChatRoomNew.findByIdAndUpdate({idRoom}, {$addToSet: {chats: idChat}}, { upsert: true, new: true })
+  ChatRoomNew.findByIdAndUpdate({_id}, {$addToSet: {chats: idChat}}, { upsert: true, new: true })
+    .populate('chats')
     .then((item) => res.status(200).send(item))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -142,10 +144,10 @@ module.exports.addChatInRoom = (req, res, next) => {
 
 // Удаляем id чата из room
 module.exports.deleteChatInRoom = (req, res, next) => {
-  const idRoom = req.params.roomId;
+  const _id = req.params.roomId;
   const idChat = req.body.chat._id;
 
-  ChatRoomNew.findByIdAndUpdate({idRoom}, {$pull: {chats: idChat}}, { upsert: true, new: true })
+  ChatRoomNew.findByIdAndUpdate({_id}, {$pull: {chats: idChat}}, { upsert: true, new: true })
     .then((item) => res.status(200).send(item))
     .catch((err) => {
       if (err.name === 'ValidationError') {
