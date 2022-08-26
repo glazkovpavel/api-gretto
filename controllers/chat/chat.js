@@ -1,4 +1,3 @@
-const ChatRoomNew = require("../../models/chat/chatRoomNew");
 const Chat = require("../../models/chat/chat");
 const BadRequestErr = require("../../errors/bad-request-err");
 const {

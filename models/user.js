@@ -35,6 +35,9 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
   },
+}, {
+  timestamps: true,
+  collection: "users",
 });
 
 module.exports = mongoose.model('user', userSchema);

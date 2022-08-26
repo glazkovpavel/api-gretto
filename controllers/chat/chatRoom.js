@@ -7,17 +7,17 @@ const {userSchema} = require('../../models/user.js');
 
 module.exports.initiate = async (req, res, next) => {
   try {
-    // const validation = makeValidation(types => ({
-    //   payload: req.body,
-    //   checks: {
-    //     userIds: {
-    //       type: types.array,
-    //       options: {unique: true, empty: false, stringOnly: true}
-    //     },
-    //     type: {type: types.enum, options: {enum: CHAT_ROOM_TYPES}},
-    //   }
-    // }));
-    // if (!validation.success) return res.status(400).json({...validation});
+    const validation = makeValidation(types => ({
+      payload: req.body,
+      checks: {
+        userIds: {
+          type: types.array,
+          options: {unique: true, empty: false, stringOnly: true}
+        },
+        type: {type: types.enum, options: {enum: CHAT_ROOM_TYPES}},
+      }
+    }));
+    if (!validation.success) return res.status(400).json({...validation});
 
     const {userIds, type} = req.body;
     const chatInitiator = req.user._id;
@@ -31,18 +31,10 @@ module.exports.initiate = async (req, res, next) => {
 module.exports.postMessage = async (req, res) => {
     try {
       const { roomId } = req.params;
-      const validation = makeValidation(types => ({
-        payload: req.body,
-        checks: {
-          messageText: { type: types.string },
-        }
-      }));
-      if (!validation.success) return res.status(400).json({ ...validation });
-
       const messagePayload = {
         messageText: req.body.messageText,
       };
-      const currentLoggedUser = req.userId;
+      const currentLoggedUser = req.user._id;
       const post = await ChatMessageModel.createPostInChatRoom(roomId, messagePayload, currentLoggedUser);
       global.io.sockets.in(roomId).emit('new message', { message: post });
       return res.status(200).json({ success: true, post });

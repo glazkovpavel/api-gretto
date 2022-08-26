@@ -3,7 +3,6 @@ const chat = require('express').Router();
 const {
   createRoom,
   getChatRoomByRoomId,
-  postMessage,
   getChatRoomsByUserId,
   getChatByUserId,
   addChatInRoom,
@@ -17,13 +16,16 @@ const {
   deleteUserInChat,
 } = require("../../controllers/chat/chat");
 
+const { postMessage, getMessageByRoomId } = require('../../controllers/chat/chatMessage');
+
 chat
   .get('/chatRooms', getChatRoomsByUserId)
   .get('/chat', getChatByUserId)
   .get('/chat/:roomId', getChatRoomByRoomId)
+  .get('/chat-message/:roomId', getMessageByRoomId)
   .post('/chat/initiate', createRoom)
-  .post('/chat/:roomId/message', postMessage)
   .post('/chat', createChatInRoom)
+  .post('/chat-message/:roomId', postMessage)
   .patch('/chat-delete', deleteChat)
   .patch('/chat-add-user', addUserInChat)
   .patch('/chat-delete-user', deleteUserInChat)
