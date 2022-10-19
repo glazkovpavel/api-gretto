@@ -79,6 +79,7 @@ module.exports.deleteChatInRoom = (req, res, next) => {
   const idChat = req.body.chat._id;
 
   ChatRoomNew.findByIdAndUpdate({_id}, {$pull: {chats: idChat}}, { upsert: true, new: true })
+    .populate('chats')
     .then((item) => res.status(200).send(item))
     .catch((err) => {
       if (err.name === 'ValidationError') {
