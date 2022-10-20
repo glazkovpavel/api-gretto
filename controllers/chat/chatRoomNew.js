@@ -37,9 +37,9 @@ module.exports.getChatRoomByRoomId = (req, res, next) => {
 
 module.exports.getChatByUserId = (req, res, next) => {
   const userId = req.user._id;
-    Chat.find({userId})
+    Chat.find({ users: { $all: [userId] } })
     .then((chats) => {
-      ChatRoomNew.find({userId})
+      ChatRoomNew.find({chatInitiator: userId})
         .populate('chats')
         .then((rooms) => {
           //const roomIds = rooms.map(room => room._id);

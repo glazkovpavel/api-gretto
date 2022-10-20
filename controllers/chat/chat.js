@@ -9,6 +9,7 @@ const {
 } = require("../../errors/error-text");
 const NotFoundError = require("../../errors/not-found-err");
 const ForbiddenErr = require("../../errors/forbidden-err");
+const ChatRoomNew = require("../../models/chat/chatRoomNew");
 
 // Создаём чат
 module.exports.createChatInRoom = (req, res, next) => {
@@ -85,7 +86,18 @@ module.exports.deleteUserInChat = (req, res, next) => {
         throw new ForbiddenErr(forbiddenErrorTextDeleteOwner);
       } else if (chat.chatInitiator.toString() === chatDeleteInitiator || chat.kind === 0) {
         Chat.findByIdAndUpdate({_id}, {$pull: {users: userDelete._id}}, { upsert: true, new: true })
-          .then((item) => res.status(200).send(item));
+          .then((item) => {
+            ChatRoomNew.find({ chatInitiator: userDelete._id, chats: { $all: [_id] } })
+              .then((deleteChat) => {
+                if (deleteChat.length) {
+                  deleteChat.forEach((chat) => {
+                    ChatRoomNew.findByIdAndUpdate({_id: chat._id}, {$pull: {chats: [_id]}})
+                      .then((res) => console.log(res))
+                  })
+                }
+              })
+            return res.status(200).send(item);
+          });
       } else {
         throw new ForbiddenErr(forbiddenErrorText);
       }
